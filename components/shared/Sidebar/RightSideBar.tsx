@@ -33,9 +33,9 @@ const RightSideBar = () => {
               <Link
                 key={question._id}
                 href={`/questions/${question._id}`}
-                className={`text-dark300_light900 flex gap-4 rounded-lg px-4`}
+                className={`flex cursor-pointer items-center justify-between gap-7`}
               >
-                <p className={"text-sm leading-[18.20px]"}>{question.title}</p>
+                <p className={"body-medium"}>{question.title}</p>
                 <Image
                   src="/assets/icons/chevron-right.svg"
                   height={20}

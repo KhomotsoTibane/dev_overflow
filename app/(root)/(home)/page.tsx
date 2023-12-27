@@ -6,73 +6,14 @@ import Link from "next/link";
 import HomeFilters from "@/components/home/HomeFilters";
 import NoResult from "@/components/shared/NoResult";
 import QuestionCard from "@/components/cards/QuestionCard";
+import { getQuestions } from "@/lib/actions/question.action";
 
-const questions = [
-  {
-    _id: "1",
-    title: "How to use TypeScript interfaces?",
-    questionToTags: [
-      {
-        questionId: "1",
-        tagId: "101",
-        tag: {
-          id: "101",
-          name: "TypeScript",
-        },
-      },
-      {
-        questionId: "1",
-        tagId: "102",
-        tag: {
-          id: "102",
-          name: "Interfaces",
-        },
-      },
-    ],
-    author: {
-      id: "user1",
-      name: "John Doe",
-      avatar: "avatar1.jpg",
-    },
-    upvotes: 1500000,
-    views: 500000,
-    answers: 750,
-    createdAt: new Date("2023-01-01"),
-  },
-  {
-    _id: "2",
-    title: "Working with React hooks",
-    questionToTags: [
-      {
-        questionId: "2",
-        tagId: "103",
-        tag: {
-          id: "103",
-          name: "React",
-        },
-      },
-      {
-        questionId: "2",
-        tagId: "104",
-        tag: {
-          id: "104",
-          name: "Hooks",
-        },
-      },
-    ],
-    author: {
-      id: "user2",
-      name: "Jane Doe",
-      avatar: "avatar2.jpg",
-    },
-    upvotes: 15,
-    views: 150,
-    answers: 5,
-    createdAt: new Date("2023-02-15"),
-  },
-];
 
-export default function Home() {
+export default async function Home() {
+  const result = await getQuestions({});
+
+  console.log("res", result.questions);
+
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -104,15 +45,15 @@ export default function Home() {
 
       <HomeFilters />
       <div className="mt-10 flex w-full flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map((question, i) => {
+        {result.questions.length > 0 ? (
+          result.questions.map((question, i) => {
             return (
               <QuestionCard
                 key={i}
                 _id={question._id}
                 title={question.title}
+                tags={question.tags}
                 upvotes={question.upvotes}
-                questionToTags={question.questionToTags}
                 author={question.author}
                 views={question.views}
                 answers={question.answers}

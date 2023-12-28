@@ -51,8 +51,6 @@ const Question = ({ mongoUserId }: Props) => {
       // make async call to apito create question
       // contain all form data
 
-      console.log("values", values);
-
       await createQuestion({
         title: values.title,
         content: values.explanation,
@@ -69,7 +67,7 @@ const Question = ({ mongoUserId }: Props) => {
       setIsSubmitting(false);
     }
 
-    console.log("values 2", values);
+
   }
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {

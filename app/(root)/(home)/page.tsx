@@ -12,7 +12,7 @@ import { getQuestions } from "@/lib/actions/question.action";
 export default async function Home() {
   const result = await getQuestions({});
 
-  console.log("res", result.questions);
+  // console.log("res", result.questions);
 
   return (
     <>

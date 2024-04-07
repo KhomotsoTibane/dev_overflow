@@ -1,0 +1,35 @@
+import { getUserQuestionsStats } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
+import React from "react";
+import QuestionCard from "../cards/QuestionCard";
+
+interface Props extends SearchParamsProps {
+  userId: string;
+  clerkId?: string | null;
+}
+
+const QuestionsTab = async ({ searchParams, userId, clerkId }: Props) => {
+  const result = await getUserQuestionsStats({ userId, page: 1 });
+  return (
+    <>
+      {result.questions.map((question) => {
+        return (
+          <QuestionCard
+            key={question._id}
+            _id={question._id}
+            clerkId={clerkId}
+            title={question.title}
+            tags={question.tags}
+            upvotes={question.upvotes}
+            author={question.author}
+            views={question.views}
+            answers={question.answers}
+            createdAt={question.createdAt}
+          />
+        );
+      })}
+    </>
+  );
+};
+
+export default QuestionsTab;

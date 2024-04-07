@@ -7,7 +7,6 @@ import Link from "next/link";
 import { getTimestamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
-
 interface AnswerProps {
   questionId: string;
   userId: string;
@@ -23,6 +22,7 @@ const AllAnswers = async ({
   page,
   filter,
 }: AnswerProps) => {
+  
   const result = await getAnswers({ questionId });
   return (
     <div className="mt-11">
@@ -57,7 +57,18 @@ const AllAnswers = async ({
                       </p>
                     </div>
                   </Link>
-                  <div className="flex justify-end">Votes</div>
+                  <div className="flex justify-end">
+                    {" "}
+                    <Votes
+                      type="Answer"
+                      itemId={JSON.stringify(answer._id)}
+                      userId={JSON.stringify(userId)}
+                      upvotes={answer.upvotes.length}
+                      hasupVoted={answer.upvotes.includes(userId)}
+                      downvotes={answer.downvotes.length}
+                      hasdownVoted={answer.downvotes.includes(userId)}
+                    />
+                  </div>
                 </div>
               </div>
               <ParseHTML data={answer.content} />

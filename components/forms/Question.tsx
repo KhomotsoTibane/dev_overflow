@@ -18,30 +18,33 @@ import { Input } from "@/components/ui/input";
 import { QuestionsSchema } from "@/lib/validations";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
-import { createQuestion } from "@/lib/actions/question.action";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeProvider";
 
-const type: any = "create";
-
 interface Props {
+  type?: string;
   mongoUserId: string;
+  questionDetails?: string;
 }
 
-const Question = ({ mongoUserId }: Props) => {
-  const {mode} = useTheme()
+const Question = ({ type, mongoUserId, questionDetails }: Props) => {
+  const { mode } = useTheme();
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
+  const parsedQuestionDetails = JSON.parse(questionDetails || "");
+  const groupedTags = parsedQuestionDetails.tags.map((tag) => tag.name);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
-      title: "",
-      explanation: "",
-      tags: [],
+      title: parsedQuestionDetails.title || "",
+      explanation: parsedQuestionDetails.content || "",
+      tags: groupedTags || [],
     },
   });
 
@@ -53,14 +56,24 @@ const Question = ({ mongoUserId }: Props) => {
       // make async call to apito create question
       // contain all form data
 
-      await createQuestion({
-        title: values.title,
-        content: values.explanation,
-        tags: values.tags,
-        author: JSON.parse(mongoUserId),
-        path: pathname,
-      });
-
+      if (type === "Edit") {
+        await editQuestion({
+          questionId: parsedQuestionDetails._id,
+          title: values.title,
+          content: values.explanation,
+          path: pathname,
+        });
+        router.push(`/question${parsedQuestionDetails._id}`);
+      } else {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: JSON.parse(mongoUserId),
+          path: pathname,
+        });
+        router.push("/");
+      }
       // navigate to home
 
       router.push("/");
@@ -68,11 +81,12 @@ const Question = ({ mongoUserId }: Props) => {
     } finally {
       setIsSubmitting(false);
     }
-
-
   }
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    field: any,
+  ) => {
     if (e.key === "Enter" && field.name === "tags") {
       e.preventDefault();
 
@@ -98,20 +112,26 @@ const Question = ({ mongoUserId }: Props) => {
   };
 
   const handleTagRemove = (tag: string, field: any) => {
-    const newTags = field.value.filter((singleTag: string) => singleTag !== tag);
+    const newTags = field.value.filter(
+      (singleTag: string) => singleTag !== tag,
+    );
     form.setValue("tags", newTags);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-10">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex w-full flex-col gap-10"
+      >
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem className="flex w-full flex-col">
               <FormLabel className="paragraph-semibold text-dark400_light800">
-                Title of your question<span className="text-primary-500">*</span>
+                Title of your question
+                <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
@@ -120,7 +140,8 @@ const Question = ({ mongoUserId }: Props) => {
                 />
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
-                Be specific and imagine you are asking a question to another person
+                Be specific and imagine you are asking a question to another
+                person
               </FormDescription>
               <FormMessage className="text-red-500" />
             </FormItem>
@@ -132,7 +153,8 @@ const Question = ({ mongoUserId }: Props) => {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="paragraph-semibold text-dark400_light800">
-                Detailed explanation of your problem<span className="text-primary-500">*</span>
+                Detailed explanation of your problem
+                <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Editor
@@ -143,7 +165,7 @@ const Question = ({ mongoUserId }: Props) => {
                   }}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
-                  initialValue=""
+                  initialValue={parsedQuestionDetails.content || ""}
                   init={{
                     height: 350,
                     menubar: false,
@@ -175,7 +197,8 @@ const Question = ({ mongoUserId }: Props) => {
                 />
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
-                Introduce the problem you are facing and expand on the title. Minimum 20 characters
+                Introduce the problem you are facing and expand on the title.
+                Minimum 20 characters
               </FormDescription>
               <FormMessage className="text-red-500" />
             </FormItem>
@@ -192,6 +215,7 @@ const Question = ({ mongoUserId }: Props) => {
               <FormControl className="mt-3.5">
                 <>
                   <Input
+                    disabled={type === "Edit"}
                     className="no-focus light-border-2 background-light900_dark300 text-dark300_light700 min-h-[56px] border"
                     placeholder="Add tags..."
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
@@ -203,16 +227,22 @@ const Question = ({ mongoUserId }: Props) => {
                           <Badge
                             key={i}
                             className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
-                            onClick={() => handleTagRemove(tag, field)}
+                            onClick={() =>
+                              type !== "Edit"
+                                ? handleTagRemove(tag, field)
+                                : () => {}
+                            }
                           >
                             {tag}
-                            <Image
-                              src="/assets/icons/close.svg"
-                              alt="close"
-                              height={12}
-                              width={12}
-                              className="cursor-pointer object-contain invert-0 dark:invert"
-                            />
+                            {type !== "Edit" && (
+                              <Image
+                                src="/assets/icons/close.svg"
+                                alt="close"
+                                height={12}
+                                width={12}
+                                className="cursor-pointer object-contain invert-0 dark:invert"
+                              />
+                            )}
                           </Badge>
                         );
                       })}
@@ -221,8 +251,8 @@ const Question = ({ mongoUserId }: Props) => {
                 </>
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
-                Add up to three tags to describe what your question is about. You need to press
-                enter to add a tag.
+                Add up to three tags to describe what your question is about.
+                You need to press enter to add a tag.
               </FormDescription>
               <FormMessage className="text-red-500" />
             </FormItem>
@@ -234,9 +264,9 @@ const Question = ({ mongoUserId }: Props) => {
           className="primary-gradient w-fit text-light-900"
         >
           {isSubmitting ? (
-            <>{type === "edit" ? "Editing" : "Posting"}</>
+            <>{type === "Edit" ? "Editing" : "Posting"}</>
           ) : (
-            <>{type === "edit" ? "Edit Question" : "Ask a question"}</>
+            <>{type === "Edit" ? "Edit Question" : "Ask a question"}</>
           )}
         </Button>
       </form>

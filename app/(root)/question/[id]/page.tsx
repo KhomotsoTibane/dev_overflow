@@ -11,8 +11,9 @@ import { auth } from "@clerk/nextjs";
 import { getUserById } from "@/lib/actions/user.action";
 import AllAnswers from "@/components/shared/AllAnswers";
 import Votes from "@/components/shared/Votes";
+import { URLProps } from "@/types";
 
-const Page = async ({ params, searchParams }) => {
+const Page = async ({ params, searchParams }: URLProps) => {
   console.log("params", params);
   const { userId: clerkId } = auth();
 
@@ -22,6 +23,8 @@ const Page = async ({ params, searchParams }) => {
     mongoUser = await getUserById({ userId: clerkId });
   }
   const result = await getQuestionById({ questionId: params.id });
+
+  console.log("mongoUser:", mongoUser, "clerkId", clerkId);
 
   return (
     <>
@@ -44,14 +47,14 @@ const Page = async ({ params, searchParams }) => {
           <div className="flex justify-end">
             {" "}
             <Votes
-            type="question"
-            itemId={JSON.stringify(result._id)}
-            userId={JSON.stringify(result._id)}
-            upvotes={result.upvotes.length}
-            hasUpVoted={result.upvotes.includes(mongoUser._id)}
-            downvotes={result.downvotes.length}
-            hasDownVoted={result.downvotes.includes(mongoUser._id)}
-            hasSaved={mongoUser?.saved.includes(result._id)}
+              type="Question"
+              itemId={JSON.stringify(result._id)}
+              userId={JSON.stringify(mongoUser._id)}
+              upvotes={result.upvotes.length}
+              hasupVoted={result.upvotes.includes(mongoUser._id)}
+              downvotes={result.downvotes.length}
+              hasdownVoted={result.downvotes.includes(mongoUser._id)}
+              hasSaved={mongoUser?.saved.includes(result._id)}
             />{" "}
           </div>
         </div>
@@ -99,7 +102,7 @@ const Page = async ({ params, searchParams }) => {
 
       <AllAnswers
         questionId={result._id}
-        userId={JSON.stringify(mongoUser._id)}
+        userId={mongoUser._id}
         totalAnswers={result.answers.length}
       />
 

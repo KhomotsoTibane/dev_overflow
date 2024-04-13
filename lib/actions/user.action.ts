@@ -47,9 +47,18 @@ export async function getAllUsers(params: GetAllUsersParams) {
   try {
     connectToDatabase();
 
-    // const {page = 1, pageSize=20, filter, searchQuery} = params
+    const { searchQuery } = params;
 
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const query: FilterQuery<typeof User> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+        { username: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 });
     return { users };
   } catch (error) {
     console.log("error", error);
@@ -136,9 +145,14 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
 
     const { clerkId, searchQuery } = params;
 
-    const query: FilterQuery<typeof Question> = searchQuery
-      ? { title: { $regex: new RegExp(searchQuery, "i") } }
-      : {};
+    const query: FilterQuery<typeof Question> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
 
     const user = await User.findOne({ clerkId }).populate({
       path: "saved",
@@ -183,11 +197,10 @@ export async function getUserInfo(params: GetUserByIdParams) {
     throw error;
   }
 }
-
 export async function getUserQuestionsStats(params: GetUserStatsParams) {
   try {
     connectToDatabase();
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId } = params;
 
     const totalQuestions = await Question.countDocuments({ author: userId });
 
@@ -205,11 +218,10 @@ export async function getUserQuestionsStats(params: GetUserStatsParams) {
     throw error;
   }
 }
-
 export async function getUserAnswerStats(params: GetUserStatsParams) {
   try {
     connectToDatabase();
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId } = params;
 
     const totalAnswers = await Answer.countDocuments({ author: userId });
 
@@ -220,7 +232,7 @@ export async function getUserAnswerStats(params: GetUserStatsParams) {
       .populate("question", "_id title")
       .populate("author", "_id clerkId name picture");
 
-      console.log(userAnswers)
+    console.log(userAnswers);
 
     return { totalAnswers, answers: userAnswers };
   } catch (error) {
@@ -228,6 +240,23 @@ export async function getUserAnswerStats(params: GetUserStatsParams) {
     throw error;
   }
 }
+export async function getTopQuestions() {
+  try {
+    connectToDatabase();
+    const topQuestions = await Question.find({})
+      .sort({
+        views: -1,
+        upvotes: -1,
+      })
+      .limit(5);
+
+    return topQuestions;
+  } catch (error) {
+    console.log("error", error);
+    throw error;
+  }
+}
+
 // export async function getUserById(params: any) {
 //     try {
 //       connectToDatabase();

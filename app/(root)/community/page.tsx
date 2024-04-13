@@ -6,10 +6,12 @@ import Link from "next/link";
 import Filter from "@/components/shared/filter/Filter";
 import { UserFilters } from "@/constants/filters";
 import UserCard from "@/components/cards/UserCard";
+import { SearchParamsProps } from "@/types";
 
-const Page = async () => {
-  const result = await getAllUsers({});
-  // console.log("all users", result);
+const Page = async ({searchParams}:SearchParamsProps) => {
+  const result = await getAllUsers({
+    searchQuery:searchParams.q
+  });
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">DevFlow Users</h1>

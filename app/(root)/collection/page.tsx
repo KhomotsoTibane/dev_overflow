@@ -7,6 +7,7 @@ import { getSavedQuestions } from "@/lib/actions/user.action";
 import { auth } from "@clerk/nextjs";
 import { SearchParamsProps } from "@/types";
 
+
 export default async function Home({searchParams}:SearchParamsProps) {
   const { userId } = auth();
 
@@ -16,7 +17,8 @@ export default async function Home({searchParams}:SearchParamsProps) {
 
   const result = await getSavedQuestions({
     clerkId: userId,
-    searchQuery:searchParams.q
+    searchQuery:searchParams.q,
+    filter:searchParams.filter
   });
 
   return (
@@ -34,13 +36,13 @@ export default async function Home({searchParams}:SearchParamsProps) {
         <Filter
           filter={QuestionFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
-          containerClasses="hidden max-md:flex"
+          containerClasses="hidden md:flex"
         />
       </div>
 
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
-          result.questions.map((question, i) => {
+          result.questions.map((question) => {
             return (
               <QuestionCard
                 key={question._id}

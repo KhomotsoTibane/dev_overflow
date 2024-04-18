@@ -3,14 +3,15 @@ import { getAllTags } from "@/lib/actions/tag.actions";
 import React from "react";
 // import { Button } from "@/components/ui/button";
 import Filter from "@/components/shared/filter/Filter";
-import { UserFilters } from "@/constants/filters";
+import { TagFilters} from "@/constants/filters";
 import TagCard from "@/components/cards/TagCard";
 import NoResult from "@/components/shared/NoResult";
 import { SearchParamsProps } from "@/types";
 
 const Page = async ({searchParams}:SearchParamsProps) => {
   const result = await getAllTags({
-    searchQuery:searchParams.q
+    searchQuery:searchParams.q,
+    filter:searchParams.filter
   });
 
   return (
@@ -27,7 +28,7 @@ const Page = async ({searchParams}:SearchParamsProps) => {
         />
 
         <Filter
-          filter={UserFilters}
+          filter={TagFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
           containerClasses=""
         />

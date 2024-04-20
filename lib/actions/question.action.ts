@@ -4,7 +4,6 @@ import Tag from "@/database/tag.model";
 import { connectToDatabase } from "../mongoose";
 import {
   CreateQuestionParams,
-  DeleteAnswerParams,
   DeleteQuestionParams,
   EditQuestionParams,
   GetQuestionByIdParams,
@@ -66,7 +65,6 @@ export async function getQuestions(params: GetQuestionsParams) {
     throw error;
   }
 }
-
 export async function createQuestion(params: CreateQuestionParams) {
   try {
     connectToDatabase();
@@ -103,7 +101,6 @@ export async function createQuestion(params: CreateQuestionParams) {
     revalidatePath(path);
   } catch (error) {}
 }
-
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
     connectToDatabase();
@@ -127,7 +124,6 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
     throw error;
   }
 }
-
 export async function upvoteQuestion(params: QuestionVoteParams) {
   try {
     connectToDatabase();
@@ -163,7 +159,6 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     throw error;
   }
 }
-
 export async function downvoteQuestion(params: QuestionVoteParams) {
   try {
     connectToDatabase();
@@ -197,7 +192,6 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     throw error;
   }
 }
-
 export async function DeleteQuestion(params: DeleteQuestionParams) {
   try {
     connectToDatabase();
@@ -217,7 +211,6 @@ export async function DeleteQuestion(params: DeleteQuestionParams) {
     throw error;
   }
 }
-
 export async function editQuestion(params: EditQuestionParams) {
   try {
     connectToDatabase();

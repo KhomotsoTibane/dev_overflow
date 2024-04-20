@@ -11,16 +11,6 @@ import { FilterQuery } from "mongoose";
 import Tag, { ITag } from "@/database/tag.model";
 import Question from "@/database/question.model";
 
-// export async function getUserById(params: any) {
-//     try {
-//       connectToDatabase();
-
-//     } catch (error) {
-//       console.log("error", error);
-//       throw error;
-//     }
-//   }
-
 export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectToDatabase();
@@ -66,7 +56,6 @@ export async function getAllTags(params: GetAllTagsParams) {
     throw error;
   }
 }
-
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
     connectToDatabase();
@@ -93,7 +82,6 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
     throw error;
   }
 }
-
 export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
   try {
     connectToDatabase();
@@ -135,7 +123,6 @@ export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
     throw error;
   }
 }
-
 export async function getPopularTags() {
   try {
     connectToDatabase();

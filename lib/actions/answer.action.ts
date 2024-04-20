@@ -73,7 +73,6 @@ export async function getAnswers(params: GetAnswersParams) {
     throw error;
   }
 }
-
 export async function upvoteAnswer(params: AnswerVoteParams) {
   try {
     connectToDatabase();
@@ -106,7 +105,6 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     throw error;
   }
 }
-
 export async function downvoteAnswer(params: AnswerVoteParams) {
   try {
     connectToDatabase();
@@ -139,7 +137,6 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     throw error;
   }
 }
-
 export async function DeleteAnswer(params: DeleteAnswerParams) {
   try {
     connectToDatabase();

@@ -5,13 +5,16 @@ import { IQuestion } from "@/database/question.model";
 import { getQuestionByTagId } from "@/lib/actions/tag.actions";
 import { URLProps } from "@/types";
 import React from "react";
+import Pagination from "@/components/shared/Pagination";
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const result = await getQuestionByTagId({
     tagId: params.id,
-    page: 1,
+    page: searchParams.page ? +searchParams.page : 1,
     searchQuery: searchParams.q,
   });
+
+  console.log("result", result)
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">{result.tagTitle}</h1>
@@ -28,6 +31,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question: IQuestion) => {
+            console.log("question", question)
             return (
               <QuestionCard
                 key={question._id}
@@ -50,6 +54,12 @@ const Page = async ({ params, searchParams }: URLProps) => {
             linkTitle="Ask a Question"
           />
         )}
+      </div>
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
   );

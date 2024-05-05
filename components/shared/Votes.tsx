@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { saveQuestion } from "@/lib/actions/user.action";
 import { useEffect } from "react";
 import { viewQuestion } from "@/lib/actions/interaction.action";
+import { useToast } from "@/components/ui/use-toast";
 
 interface VoteProps {
   type: string;
@@ -34,21 +35,33 @@ const Votes = ({
 }: VoteProps) => {
   const pathname = usePathname();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSave = async () => {
     if (!userId) {
-      return;
+      return toast({
+        title: "Please log in",
+        description: "You must be logged in to perfom this action",
+      });
     }
     await saveQuestion({
       userId: JSON.parse(userId),
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+
+    return toast({
+      title: `Question ${!hasSaved ? "Saved" : "Removed"} `,
+      variant: !hasSaved ? "default" : "destructive",
+    });
   };
 
   const handleVote = async (action: string) => {
     if (!userId) {
-      return;
+      return toast({
+        title: "Please log in",
+        description: "You must be logged in to perfom this action",
+      });
     }
 
     if (action === "downvote") {
@@ -69,6 +82,10 @@ const Votes = ({
           path: pathname,
         });
       }
+      return toast({
+        title: `Downvote ${!hasdownVoted ? "Added" : "Removed"} `,
+        variant: !hasdownVoted ? "default" : "destructive",
+      });
     }
 
     if (action === "upvote") {
@@ -89,6 +106,11 @@ const Votes = ({
           path: pathname,
         });
       }
+
+      return toast({
+        title: `Upvote ${!hasupVoted ? "Added" : "Removed"} `,
+        variant: !hasupVoted ? "default" : "destructive",
+      });
     }
   };
 
@@ -97,7 +119,6 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       userId: userId ? JSON.parse(userId) : undefined,
     });
-
   }, [itemId, userId, pathname, router]);
 
   return (

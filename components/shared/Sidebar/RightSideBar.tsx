@@ -20,7 +20,7 @@ const RightSideBar = async () => {
                 href={`/question/${question._id}`}
                 className={`flex cursor-pointer items-center justify-between gap-7`}
               >
-                <p className={"body-medium"}>{question.title}</p>
+                <p className={"body-medium text-dark200_light900"}>{question.title}</p>
                 <Image
                   src="/assets/icons/chevron-right.svg"
                   height={20}

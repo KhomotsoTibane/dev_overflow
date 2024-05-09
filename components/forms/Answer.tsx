@@ -17,6 +17,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { usePathname } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   question: string;
@@ -27,7 +28,7 @@ interface Props {
 const Answer = ({ question, questionId, authorId }: Props) => {
   const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGeneratingAi] = useState(false);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const { mode } = useTheme();
   const editorRef = useRef(null);
   const form = useForm<z.infer<typeof AnswerSchema>>({
@@ -36,9 +37,19 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       answer: "",
     },
   });
+  const { toast } = useToast();
 
   const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
-    setIsSubmitting(true);
+   
+
+    if (!authorId) 
+      return toast({
+        title: "Please log in",
+        description: "You must be logged in to perfom this action",
+      });
+
+      setIsSubmitting(true);
+    
 
     try {
       await createAnswer({
@@ -61,39 +72,48 @@ const Answer = ({ question, questionId, authorId }: Props) => {
     }
   };
 
-  // const handleGenerateAiAnswer = async () => {
-  //   if (!authorId) {
-  //     return;
-  //   }
+  const handleGenerateAiAnswer = async () => {
 
-  //   setIsGeneratingAi(true);
+    if (!authorId) 
+      return toast({
+        title: "Please log in",
+        description: "You must be logged in to generate an Ai answer",
+      });
 
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
-  //       {
-  //         method: "POST",
-  //         body: JSON.stringify({ question }),
-  //       },
-  //     );
 
-  //     const aiAnswer = await response.json();
-  //     console.log("ai", aiAnswer)
+    setIsGeneratingAi(true);
 
-  //     const formattedAnswer = aiAnswer.reply.replace(/\n/g, '<br />');
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
+        {
+          method: "POST",
+          body: JSON.stringify({ question }),
+        },
+      );
 
-  //     if (editorRef.current) {
-  //       const editor = editorRef.current as any;
-  //       editor.setContent(formattedAnswer);
-  //     }
+      const aiAnswer = await response.json();
+      console.log("ai", aiAnswer)
 
-  //     alert(aiAnswer.reply);
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   } finally {
-  //     setIsGeneratingAi(false);
-  //   }
-  // };
+      const formattedAnswer = aiAnswer.reply.replace(/\n/g, '<br />');
+
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent(formattedAnswer);
+      }
+
+      alert(aiAnswer.reply);
+    } catch (error) {
+      console.log("error", error);
+      
+        return toast({
+          title: "Unable to generate Ai answer at this time",
+          description: "Please submit your answer manually",
+        });
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
   return (
     <div>
       <div className="mt-4 flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -102,7 +122,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         </h4>
         <Button
           className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500"
-          onClick={() => {}}
+          onClick={handleGenerateAiAnswer}
         >
           {isGeneratingAi ? (
             <>Generating...</>

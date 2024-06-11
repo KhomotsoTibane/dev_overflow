@@ -44,17 +44,39 @@ export const getTimestamp = (createdAt: Date): string => {
   }
 };
 
+// export const formatAndDivideNumber = (num: number): string => {
+//   if (num >= 1000000) {
+//     const formattedNum = (num / 1000000).toFixed(1);
+//     return `${formattedNum}M`;
+//   } else if (num >= 1000) {
+//     const formattedNum = (num / 1000).toFixed(1);
+//     return `${formattedNum}K`;
+//   } else {
+//     return num.toString();
+//   }
+// };
+
 export const formatAndDivideNumber = (num: number): string => {
+  if (num < 0) {
+    return "0";
+  }
+
+  const formatNumber = (n: number): string => {
+    const fixed = Math.floor(n * 10) / 10;
+    return fixed.toString();
+  };
+
   if (num >= 1000000) {
-    const formattedNum = (num / 1000000).toFixed(1);
-    return `${formattedNum}M`;
+    const formattedNum = num / 1000000;
+    return `${formatNumber(formattedNum)}M`;
   } else if (num >= 1000) {
-    const formattedNum = (num / 1000).toFixed(1);
-    return `${formattedNum}K`;
+    const formattedNum = num / 1000;
+    return `${formatNumber(formattedNum)}K`;
   } else {
-    return num.toString();
+    return formatNumber(num);
   }
 };
+
 
 export const getJoinedDate = (date: Date): string => {
   // Get the month and year from the Date object

@@ -69,7 +69,7 @@ To get a local copy up and running follow these simple steps.
 2. Install packages
     ```sh
     npm install
-3. Clone the repo
+3. Environment Variables
    ```sh
    NEXT_PUBLIC_CLERK_FRONTEND_API=<your-clerk-api-key>
    MONGODB_URI=<your-mongodb-uri>
